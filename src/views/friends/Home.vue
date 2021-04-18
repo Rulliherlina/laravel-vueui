@@ -19,8 +19,8 @@
       <td>{{ friend.no_tlp }}</td>
       <td>{{ friend.alamat }}</td>
       <td>
-        <router-link class="btn btn-success" to="/editfriends">Edit</router-link>
-        <button class="btn btn-danger">Delete</button>
+        <router-link class="btn btn-success" :to="{name:'Editfriends', params:{id:friend.id}}">Edit</router-link>
+        <button @click.prevent="friendDelete(friend.id)" class="btn btn-danger">Delete</button>
       </td>
     </tr>
   </tbody>
@@ -33,6 +33,7 @@ import axios from 'axios'
 // @ is an alias to /src
 import Slider from "@/components/Slider.vue";
 import { ref, onMounted } from 'vue';
+
 export default {
   name: "Home",
   components: {
@@ -40,8 +41,9 @@ export default {
   },
   setup(){
     let friends = ref([])
+
     onMounted(() => {
-      axios.get('http://127.0.0.1:8000/api/friends')
+      axios.get('http://pia.labirin.co.id/api/friends')
       .then(response => {
         friends.value = response.data.data
       })
@@ -49,8 +51,20 @@ export default {
         console.log(error)
       })
     })
+
+    function friendDelete(id){
+      axios.delete(`http://pia.labirin.co.id/api/friends/${id}`)
+      .then(()=>{
+        let z = this.friends.map(friends => friends.id).indexOf(id);
+        this.friends.splice(z, 1)
+      }).catch(error => {
+        console.log(error)
+      })
+    }
+
       return {
-      friends
+      friends,
+      friendDelete
     }
   }
 };
